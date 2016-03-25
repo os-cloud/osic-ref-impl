@@ -1,0 +1,66 @@
+---
+shared-infra_hosts:
+  729427-controller01:
+    ip: 172.22.100.25
+  729426-controller02:
+    ip: 172.22.100.26
+  729425-controller03:
+    ip: 172.22.100.27
+
+os-infra_hosts:
+  729427-controller01:
+    ip: 172.22.100.25
+  729426-controller02:
+    ip: 172.22.100.26
+  729425-controller03:
+    ip: 172.22.100.27
+
+storage-infra_hosts:
+  729427-controller01:
+    ip: 172.22.100.25
+  729426-controller02:
+    ip: 172.22.100.26
+  729425-controller03:
+    ip: 172.22.100.27
+
+repo-infra_hosts:
+  729427-controller01:
+    ip: 172.22.100.25
+  729426-controller02:
+    ip: 172.22.100.26
+  729425-controller03:
+    ip: 172.22.100.27
+
+identity_hosts:
+  729427-controller01:
+    ip: 172.22.100.25
+  729426-controller02:
+    ip: 172.22.100.26
+  729425-controller03:
+    ip: 172.22.100.27
+
+swift-proxy_hosts:
+  729427-controller01:
+    ip: 172.22.100.25
+    container_vars:
+      swift_proxy_vars:
+        limit_container_types: swift_proxy
+        read_affinity: "r1=100"
+        write_affinity: "r1"
+        write_affinity_node_count: "1 * replicas"
+  729426-controller02:
+    ip: 172.22.100.26
+    container_vars:
+      swift_proxy_vars:
+        limit_container_types: swift_proxy
+        read_affinity: "r1=100"
+        write_affinity: "r1"
+        write_affinity_node_count: "1 * replicas"
+  729425-controller03:
+    ip: 172.22.100.27
+    container_vars:
+      swift_proxy_vars:
+        limit_container_types: swift_proxy
+        read_affinity: "r1=100"
+        write_affinity: "r1"
+        write_affinity_node_count: "1 * replicas"
