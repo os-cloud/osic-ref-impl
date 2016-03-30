@@ -30,4 +30,20 @@ Our OpenStack will be:
 * easy to deploy - it will require minimal input from operators
 * quick to deploy - our goal is to get down to 1min/node on average in scale of 300 nodes
 * easy to maintain - we will provide toolset and guidance that will help ops to keep cloud running
-* pet friendly - although we suggest move to cloud-native apps, we also recognizes that it can be long process. Our cloud will help to keep non-cloud-native apps running.
+* legacy applications friendly - although we suggest move to cloud-native apps, we also recognizes that it can be long process. Our cloud will help to keep non-cloud-native apps running. We care about our pets:)
+* passing defcore - This have to be OpenStack
+
+# Scope of Reference implementation
+
+We want entry to OpenStack to be as smooth as possible, so we are going to make most of the architectural choices for a user.
+We will try to get user input to reasonable minimum but at same time allowing more experienced users to override our decisions.
+This repo will contain:
+
+* hardware setup used
+* network configuration
+* base operating system setup
+* deployment tool configuration
+* commands to run
+* bootstrap first users
+
+So basically what you need from nothing to get your first VM up and running.
