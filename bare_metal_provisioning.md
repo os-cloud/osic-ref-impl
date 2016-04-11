@@ -54,7 +54,7 @@ Once the system boots, it can be SSH'd to using the IP address you manually assi
 
 You will need to update the Linux kernel on the deployment host in order to get an updated upstream i40e driver.
 
-    apt-get update; apt-get install linux-image-extra-4.4.0-14-generic
+    apt-get update; apt-get install -y linux-generic-lts-xenial
 
 When the update finishes running, reboot the server and proceed with the rest of the guide.
 
