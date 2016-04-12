@@ -54,7 +54,7 @@ Once the system boots, it can be SSH'd to using the IP address you manually assi
 
 You will need to update the Linux kernel on the deployment host in order to get an updated upstream i40e driver.
 
-    apt-get update; apt-get install linux-image-extra-4.4.0-14-generic
+    apt-get update; apt-get install -y linux-generic-lts-xenial
 
 When the update finishes running, reboot the server and proceed with the rest of the guide.
 
@@ -120,7 +120,7 @@ Move the LXC container directory into the proper directory:
 
     mv /root/osic-prep /var/lib/lxc/
 
-Once moved, the LXC container should be stopped, verify by running `lxc-ls -f`. Before starting it, open __/var/lib/lxc/osic-prep/config__ and change __lxc.network.ipv4 = 172.22.0.22/22__ to the host network you are using. Do not forget to set the CIDR notation as well. If your host network already is __172.22.0.22/22__, you do not need to make further changes.
+Once moved, the LXC container should be stopped, verify by running `lxc-ls -f`. Before starting it, open __/var/lib/lxc/osic-prep/config__ and change __lxc.network.ipv4 = 172.22.0.22/22__ to the PXE network you are using. Do not forget to set the CIDR notation as well. If your PXE network already is __172.22.0.22/22__, you do not need to make further changes.
 
     lxc.network.type = veth
     lxc.network.name = eth1
@@ -229,10 +229,11 @@ Once the CSV file is created, you can loop through each iLO to obtain the MAC ad
     do
     NAME=$(echo $i | cut -d',' -f1)
     IP=$(echo $i | cut -d',' -f2)
-    sshpass -p calvincalvin ssh -o StrictHostKeyChecking=no root@$IP show /systp1p1/network1/Integrated_NICs | grep Port1
+    MAC=$(sshpass -p calvincalvin ssh -o StrictHostKeyChecking=no root@$IP show /system1/network1/Integrated_NICs | grep Port1 | cut -d'=' -f 2)
+    echo "$NAME,$MAC"
     done
 
-Once this information is collected, another CSV file needs to be created. This CSV will be the input for many different steps in the build process.
+Once this information is collected, it will be used to create another CSV file that will be the input for many different steps in the build process.
 
 ### Create Input CSV
 
@@ -296,7 +297,7 @@ Once all of the __cobbler systems__ are setup, run `cobbler sync`.
 
 To begin PXE booting, reboot all of the servers with the following command (if the deployment host is the first controller, you will want to __remove__ it from the __ilo.csv__ file so you don't reboot the host running the LXC container):
 
-    for i in $(cat ilo.csv)
+    for i in $(cat /root/ilo.csv)
     do
     NAME=$(echo $i | cut -d',' -f1)
     IP=$(echo $i | cut -d',' -f2)
@@ -367,6 +368,8 @@ The LXC container will not have all of the new server's SSH fingerprints in its 
 
 Verify Ansible can talk to every server (the password is __cobbler__):
 
+    cd /root/osic-prep-ansible
+
     ansible -i hosts all -m shell -a "uptime" --ask-pass
 
 ### Setup SSH Public Keys
@@ -379,6 +382,14 @@ Copy the LXC container's SSH public key to the __osic-prep-ansible__ directory:
 
     cp /root/.ssh/id_rsa.pub /root/osic-prep-ansible/playbooks/files/public_keys/osic-prep
 
+### Run the Bootstrap
+
+Finally, run the bootstrap.yml Ansible Playbook:
+
+    cd /root/osic-prep-ansible
+
+    ansible-playbook -i hosts playbooks/bootstrap.yml --ask-pass
+
 ### Update Linux Kernel
 
 Every server in the OSIC RAX Cluster is running two Intel X710 10 GbE NICs. These NICs have not been well tested in Ubuntu and as such the upstream i40e driver in the default 14.04.3 Linux kernel will begin showing issues when you setup VLAN tagged interfaces and bridges.
@@ -387,21 +398,15 @@ In order to get around this, you must install an updated Linux kernel.
 
 You can quickly do this by running the following commands:
 
-    ansible -i hosts all -m shell -a "apt-get update; apt-get install linux-image-extra-4.4.0-14-generic" --forks 25
+    cd /root/osic-prep-ansible
+
+    ansible -i hosts all -m shell -a "apt-get update; apt-get install -y linux-generic-lts-xenial" --forks 25
 
 Reboot all servers to apply the new Linux kernel:
 
     ansible -i hosts all -m shell -a "reboot" --forks 25
 
 Once all servers reboot, you can proceed with the guide.
-
-### Run the Bootstrap
-
-Finally, run the bootstrap.yml Ansible Playbook:
-
-    cd /root/osic-prep-ansible
-
-    ansible-playbook -i hosts playbooks/bootstrap.yml
 
 Create the osic-prep LXC Container
 ----------------------------------
