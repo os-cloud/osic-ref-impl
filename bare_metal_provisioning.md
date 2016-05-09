@@ -17,7 +17,7 @@ You have been allocated a certain number of bare metal servers. There is current
 
 ### Manually Provision the Deployment Host
 
-First, download a [modified Ubuntu Server 14.04.3 ISO](http://public.thornelabs.net/ubuntu-14.04.3-server-i40e-hp-raid-x86_64.iso.iso). The modified Ubuntu Server ISO contains i40e driver version 1.3.47 and HP iLO tools.
+First, download a [modified Ubuntu Server 14.04.3 ISO](http://public.thornelabs.net/ubuntu-14.04.3-server-i40e-hp-raid-x86_64.iso). The modified Ubuntu Server ISO contains i40e driver version 1.3.47 and HP iLO tools.
 
 Boot the deployment host to this ISO using a USB drive, CD/DVD-ROM, iDRAC, or iLO. Whatever is easiest.
 
@@ -382,13 +382,27 @@ Copy the LXC container's SSH public key to the __osic-prep-ansible__ directory:
 
     cp /root/.ssh/id_rsa.pub /root/osic-prep-ansible/playbooks/files/public_keys/osic-prep
 
-### Run the Bootstrap
+### Bootstrap the Servers
 
 Finally, run the bootstrap.yml Ansible Playbook:
 
     cd /root/osic-prep-ansible
 
     ansible-playbook -i hosts playbooks/bootstrap.yml --ask-pass
+
+### Clean Up LVM Logical Volumes
+
+If this will be an openstack-ansible or RPC-O installation, you will need to clean up particular LVM Logical Volumes.
+
+Each server is provisioned with a standard set of LVM Logical Volumes. Not all servers need all of the LVM Logical Volumes. Clean them up with the following steps.
+
+Remove LVM Logical Volume __nova00__ from the Controller, Logging, Cinder, and Swift nodes:
+
+    ansible-playbook -i hosts playbooks/remove-lvs-nova00.yml
+
+Remove LVM Logical Volume __deleteme00__ from all nodes:
+
+    ansible-playbook -i hosts playbooks/remove-lvs-deleteme00.yml
 
 ### Update Linux Kernel
 
@@ -402,11 +416,13 @@ You can quickly do this by running the following commands:
 
     ansible -i hosts all -m shell -a "apt-get update; apt-get install -y linux-generic-lts-xenial" --forks 25
 
-Reboot all servers to apply the new Linux kernel:
+### Reboot Nodes
+
+Finally, reboot all servers:
 
     ansible -i hosts all -m shell -a "reboot" --forks 25
 
-Once all servers reboot, you can proceed with the guide.
+Once all servers reboot, you can begin installing openstack-ansible or RPC-O.
 
 Create the osic-prep LXC Container
 ----------------------------------
