@@ -71,14 +71,14 @@ glance image-create --name 'Ubuntu 16.04 Beta2' \
                     --file ubuntu-16.04-beta2-server-cloudimg-amd64-disk1.img
 rm ubuntu-16.04-beta2-server-cloudimg-amd64-disk1.img
 
-wget https://download.fedoraproject.org/pub/fedora/linux/releases/23/Cloud/x86_64/Images/Fedora-Cloud-Base-23-20151030.x86_64.qcow2
-glance image-create --name 'Fedora 23' \
+wget http://dfw.mirror.rackspace.com/fedora/releases/24/CloudImages/x86_64/images/Fedora-Cloud-Base-24-1.2.x86_64.qcow2
+glance image-create --name 'Fedora 24' \
                     --container-format bare \
                     --disk-format qcow2 \
                     --visibility public \
                     --progress \
-                    --file Fedora-Cloud-Base-23-20151030.x86_64.qcow2
-rm Fedora-Cloud-Base-23-20151030.x86_64.qcow2
+                    --file Fedora-Cloud-Base-24-1.2.x86_64.qcow2
+rm Fedora-Cloud-Base-24-1.2.x86_64.qcow2
 
 wget http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
 glance image-create --name 'CentOS 7' \
